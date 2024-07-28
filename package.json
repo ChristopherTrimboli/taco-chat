@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@irys/sdk": "^0.2.9",
     "@nucypher/taco": "^0.3.0",
     "@usedapp/core": "^1.2.16",
     "ethers": "^5.7.2",

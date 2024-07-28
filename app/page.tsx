@@ -1,10 +1,17 @@
 "use client";
 
-import { initialize, encrypt, conditions, domains } from "@nucypher/taco";
+import {
+  initialize,
+  encrypt,
+  conditions,
+  domains,
+  toHexString,
+} from "@nucypher/taco";
 import { ethers } from "ethers";
 import { chainIdForDomain, customTacoNetworks, RITUAL_ID } from "./config";
 import { useEffect, useState } from "react";
 import { useEthers } from "@usedapp/core";
+import { getWebIrys, uploadData } from "./irys";
 
 export default function Home() {
   const { activateBrowserWallet, account, switchNetwork } = useEthers();
@@ -40,7 +47,7 @@ export default function Home() {
 
     const message = "my secret message";
 
-    const messageKit = await encrypt(
+    const encryptedMessage = await encrypt(
       provider,
       domains.TESTNET,
       message,
@@ -49,15 +56,21 @@ export default function Home() {
         method: "eth_getBalance",
         parameters: [":userAddress"],
         returnValueTest: {
-          comparator: "==",
-          value: account,
+          comparator: ">=",
+          value: 1,
         },
       }),
       RITUAL_ID,
       provider.getSigner()
     );
 
-    console.log(messageKit);
+    console.log(encryptedMessage);
+
+    const encryptedMessageHex = toHexString(encryptedMessage.toBytes());
+    const webIrys = await getWebIrys(provider);
+    const receiptId = await uploadData(webIrys, encryptedMessageHex);
+
+    console.log(receiptId);
   };
 
   return (
